@@ -9,6 +9,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import features from "./../components/Shared/features.json";
 import { Button } from "@/components/ui/button";
 
+import { db } from "./../../configs/Index";
+import { CarListing } from "./../../configs/schema";
+//import { log } from "console";
+
 const AddListing = () => {
   const [formData, setFormData] = useState([]);
   const handleInputChange = (name, value) => {
@@ -16,11 +20,21 @@ const AddListing = () => {
       ...prevData,
       [name]: value,
     }));
+    console.log(formData);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+
+    try {
+      const result = await db.insert(CarListing).values(formData);
+      if (result) {
+        console.log("Data Saved");
+      }
+    } catch (e) {
+      console.log("Error", e);
+    }
   };
   return (
     <div>
