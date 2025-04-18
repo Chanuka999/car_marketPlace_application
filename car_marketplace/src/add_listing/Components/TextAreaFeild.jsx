@@ -1,10 +1,13 @@
 import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 
-const TextAreaFeild = () => {
+const TextAreaFeild = ({ item, handleInputChange }) => {
   return (
     <div>
-      <Textarea />
+      <Textarea
+        onChange={(e) => handleInputChange(item.name, e.target.value)}
+        required={item.required}
+      />
     </div>
   );
 };
