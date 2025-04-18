@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@radix-ui/react-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import features from "./../components/Shared/features.json";
+import { Button } from "@/components/ui/button";
 
 const AddListing = () => {
   const [formData, setFormData] = useState([]);
@@ -15,7 +16,10 @@ const AddListing = () => {
       ...prevData,
       [name]: value,
     }));
+  };
 
+  const onSubmit = (e) => {
+    e.preventDefault();
     console.log(formData);
   };
   return (
@@ -39,9 +43,15 @@ const AddListing = () => {
                       handleInputChange={handleInputChange}
                     />
                   ) : item.fieldType == "dropdown" ? (
-                    <DropDownFeild item={item} />
+                    <DropDownFeild
+                      item={item}
+                      handleInputChange={handleInputChange}
+                    />
                   ) : item.fieldType == "textarea" ? (
-                    <Textarea item={item} />
+                    <Textarea
+                      item={item}
+                      handleInputChange={handleInputChange}
+                    />
                   ) : null}
                 </div>
               ))}
@@ -54,10 +64,21 @@ const AddListing = () => {
             <div className="grid grid-cols-2 md:grid-cols-3">
               {features.features.map((item, index) => (
                 <div key={index} className="flex gap-2 items-center">
-                  <Checkbox /> <h2>{item.label}</h2>
+                  <Checkbox
+                    onCheckedChange={(value) =>
+                      handleInputChange(item.name, value)
+                    }
+                  />{" "}
+                  <h2>{item.label}</h2>
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="mt-10 flex justify-end">
+            <Button type="submit" onClick={(e) => onSubmit(e)}>
+              Submit
+            </Button>
           </div>
         </form>
       </div>
