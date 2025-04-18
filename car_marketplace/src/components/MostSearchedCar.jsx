@@ -14,7 +14,9 @@ const MostSearchedCar = () => {
 
   return (
     <div className="mx-24">
-      <h2 className="font-bold text-3xl text-center my-16">Most Search Car</h2>
+      <h2 className="font-bold text-3xl text-center mt-16 pb-7">
+        Most Search Car
+      </h2>
       <Carousel>
         <CarouselContent>
           {FakeData.carList.map((car, index) => (
