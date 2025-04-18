@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import React from "react";
+import React, { useState } from "react";
 import carDetails from "./../components/Shared/carDetails.json";
 import InputFeild from "./Components/InputFeild";
 import DropDownFeild from "./Components/DropDownFeild";
@@ -9,6 +9,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import features from "./../components/Shared/features.json";
 
 const AddListing = () => {
+  const [formData, setFormData] = useState([]);
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    console.log(formData);
+  };
   return (
     <div>
       <Header />
@@ -25,7 +34,10 @@ const AddListing = () => {
                     {item.required && <span className="text-red-500">*</span>}
                   </label>
                   {item.fieldType == "text" || item.fieldType == "number" ? (
-                    <InputFeild item={item} />
+                    <InputFeild
+                      item={item}
+                      handleInputChange={handleInputChange}
+                    />
                   ) : item.fieldType == "dropdown" ? (
                     <DropDownFeild item={item} />
                   ) : item.fieldType == "textarea" ? (
