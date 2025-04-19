@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button";
 import { db } from "../../configs/Index.js";
 import { CarListing } from "./../../configs/schema";
 import TextAreaFeild from "./Components/TextAreaFeild";
-//import { log } from "console";
+import IconFeild from "./Components/IconFeild";
 
 const AddListing = () => {
   const [formData, setFormData] = useState([]);
+  const [featureData, setFeatureData] = useState([]);
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -24,12 +25,22 @@ const AddListing = () => {
     console.log(formData);
   };
 
+  const handleFeatureChange = (name, value) => {
+    setFeatureData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    console.log(featureData);
+  };
   const onSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
 
     try {
-      const result = await db.insert(CarListing).values(formData);
+      const result = await db.insert(CarListing).values({
+        ...formData,
+        features: featureData,
+      });
       if (result) {
         console.log("Data Saved");
       }
@@ -48,7 +59,8 @@ const AddListing = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {carDetails.carDetails.map((item, index) => (
                 <div key={index}>
-                  <label className="text-sm">
+                  <label className="text-sm flex gap-2 items-center mb-1">
+                    <IconFeild icon={item?.icon} />
                     {item?.label}
                     {item.required && <span className="text-red-500">*</span>}
                   </label>
@@ -81,7 +93,7 @@ const AddListing = () => {
                 <div key={index} className="flex gap-2 items-center">
                   <Checkbox
                     onCheckedChange={(value) =>
-                      handleInputChange(item.name, value)
+                      handleFeatureChange(item.name, value)
                     }
                   />{" "}
                   <h2>{item.label}</h2>
