@@ -9,8 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import features from "./../components/Shared/features.json";
 import { Button } from "@/components/ui/button";
 
-import { db } from "./../../configs/Index";
+import { db } from "../../configs/Index.js";
 import { CarListing } from "./../../configs/schema";
+import TextAreaFeild from "./Components/TextAreaFeild";
 //import { log } from "console";
 
 const AddListing = () => {
@@ -62,7 +63,7 @@ const AddListing = () => {
                       handleInputChange={handleInputChange}
                     />
                   ) : item.fieldType == "textarea" ? (
-                    <Textarea
+                    <TextAreaFeild
                       item={item}
                       handleInputChange={handleInputChange}
                     />
