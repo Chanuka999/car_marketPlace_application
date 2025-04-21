@@ -102,7 +102,7 @@ const AddListing = () => {
               ))}
             </div>
           </div>
-
+          <Separator className="my-6" />
           <UploadImage />
 
           <div className="mt-10 flex justify-end">
