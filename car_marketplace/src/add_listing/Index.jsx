@@ -18,6 +18,7 @@ import UploadImage from "./Components/UploadImage";
 const AddListing = () => {
   const [formData, setFormData] = useState([]);
   const [featureData, setFeatureData] = useState([]);
+  const [triggerUploadImages, setTriggerUploadImages] = useState();
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -38,12 +39,16 @@ const AddListing = () => {
     console.log(formData);
 
     try {
-      const result = await db.insert(CarListing).values({
-        ...formData,
-        features: featureData,
-      });
+      const result = await db
+        .insert(CarListing)
+        .values({
+          ...formData,
+          features: featureData,
+        })
+        .returning({ id: CarListing.id });
       if (result) {
         console.log("Data Saved");
+        setTriggerUploadImages(result[0].id);
       }
     } catch (e) {
       console.log("Error", e);
@@ -103,8 +108,7 @@ const AddListing = () => {
             </div>
           </div>
           <Separator className="my-6" />
-          <UploadImage />
-
+          <UploadImage triggerUploadImages={triggerUploadImages} />
           <div className="mt-10 flex justify-end">
             <Button type="submit" onClick={(e) => onSubmit(e)}>
               Submit
