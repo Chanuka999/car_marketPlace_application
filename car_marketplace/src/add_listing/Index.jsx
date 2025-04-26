@@ -1,42 +1,43 @@
-import Header from "@/components/Header";
 import React, { useState } from "react";
+import Header from "@/components/Header";
 import carDetails from "./../components/Shared/carDetails.json";
+import features from "./../components/Shared/features.json";
+
 import InputFeild from "./Components/InputFeild";
 import DropDownFeild from "./Components/DropDownFeild";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@radix-ui/react-select";
-import { Checkbox } from "@/components/ui/checkbox";
-import features from "./../components/Shared/features.json";
-import { Button } from "@/components/ui/button";
-
-import { db } from "../../configs/Index.js";
-import { CarListing } from "./../../configs/schema";
 import TextAreaFeild from "./Components/TextAreaFeild";
 import IconFeild from "./Components/IconFeild";
 import UploadImage from "./Components/UploadImage";
 
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@radix-ui/react-select";
+
+import { db } from "../../configs/Index.js";
+import { CarListing } from "../../configs/schema";
+
 const AddListing = () => {
-  const [formData, setFormData] = useState([]);
-  const [featureData, setFeatureData] = useState([]);
-  const [triggerUploadImages, setTriggerUploadImages] = useState();
+  const [formData, setFormData] = useState({});
+  const [featureData, setFeatureData] = useState({});
+  const [carListingId, setCarListingId] = useState(null);
+  const [successMsg, setSuccessMsg] = useState("");
+
   const handleInputChange = (name, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
-    console.log(formData);
   };
 
   const handleFeatureChange = (name, value) => {
-    setFeatureData((prevData) => ({
-      ...prevData,
+    setFeatureData((prev) => ({
+      ...prev,
       [name]: value,
     }));
-    console.log(featureData);
   };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
       const result = await db
@@ -46,20 +47,29 @@ const AddListing = () => {
           features: featureData,
         })
         .returning({ id: CarListing.id });
-      if (result) {
-        console.log("Data Saved");
-        setTriggerUploadImages(result[0].id);
+
+      if (result?.length > 0) {
+        setCarListingId(result[0].id);
+        setSuccessMsg("Car listing submitted successfully!");
       }
-    } catch (e) {
-      console.log("Error", e);
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
   };
+
   return (
     <div>
       <Header />
       <div className="px-10 md:px-20 my-10">
         <h2 className="font-bold text-4xl">Add New Listing</h2>
-        <form className="p-10 border rounded-xl mt-10">
+
+        {successMsg && (
+          <div className="bg-green-100 text-green-800 p-4 rounded mt-4">
+            {successMsg}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="p-10 border rounded-xl mt-10">
           <div>
             <h2 className="font-medium text-xl mb-6">Car Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -70,17 +80,17 @@ const AddListing = () => {
                     {item?.label}
                     {item.required && <span className="text-red-500">*</span>}
                   </label>
-                  {item.fieldType == "text" || item.fieldType == "number" ? (
+                  {item.fieldType === "text" || item.fieldType === "number" ? (
                     <InputFeild
                       item={item}
                       handleInputChange={handleInputChange}
                     />
-                  ) : item.fieldType == "dropdown" ? (
+                  ) : item.fieldType === "dropdown" ? (
                     <DropDownFeild
                       item={item}
                       handleInputChange={handleInputChange}
                     />
-                  ) : item.fieldType == "textarea" ? (
+                  ) : item.fieldType === "textarea" ? (
                     <TextAreaFeild
                       item={item}
                       handleInputChange={handleInputChange}
@@ -92,6 +102,7 @@ const AddListing = () => {
           </div>
 
           <Separator className="my-6" />
+
           <div>
             <h2 className="font-medium text-xl my-6">Features</h2>
             <div className="grid grid-cols-2 md:grid-cols-3">
@@ -101,18 +112,19 @@ const AddListing = () => {
                     onCheckedChange={(value) =>
                       handleFeatureChange(item.name, value)
                     }
-                  />{" "}
+                  />
                   <h2>{item.label}</h2>
                 </div>
               ))}
             </div>
           </div>
+
           <Separator className="my-6" />
-          <UploadImage triggerUploadImages={triggerUploadImages} />
+
+          <UploadImage triggerUploadImages={carListingId} />
+
           <div className="mt-10 flex justify-end">
-            <Button type="submit" onClick={(e) => onSubmit(e)}>
-              Submit
-            </Button>
+            <Button type="submit">Submit</Button>
           </div>
         </form>
       </div>
