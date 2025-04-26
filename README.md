@@ -28,14 +28,8 @@ With advanced features, this app offers an efficient, intuitive, and interactive
 
 ---
 
-## 👥 Contributors
-A huge thanks to these amazing developers who contributed their time and skills to this project:
 
-<p align="center">
-  <a href="https://dragon.edu.lk/sipsuru">
-     <img src="https://github.com/user-attachments/assets/fa7b8388-482c-4706-af60-635456dfe380" alt="Contributions">
-  </a>
-</p>
+
 
 
 Want to see all the contributors? Check out the full list on the [Contributors page](https://github.com/Chanuka999/car_marketPlace_application/graphs/contributors).
