@@ -39,7 +39,7 @@ const CarItem = ({ car }) => {
         <Separator className="my-3" />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <h2 className="font-bold texl-lg sm:text-sm sm:text-xl">
+          <h2 className="font-bold text-lg sm:text-sm sm:text-xl">
             ${car.price}
           </h2>
           <h2 className="text-primary text-xs sm:text-sm flex gap-1 items-center">
