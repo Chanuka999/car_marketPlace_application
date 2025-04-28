@@ -6,7 +6,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { CarImages } from "./../../../configs/schema";
 import { db } from "./../../../configs/Index";
 
-const UploadImage = ({ triggerUploadImages }) => {
+const UploadImage = ({ triggerUploadImages,setLoader }) => {
   const [selectedFileList, setSelectedFileList] = useState([]);
 
   useEffect(() => {
@@ -29,27 +29,36 @@ const UploadImage = ({ triggerUploadImages }) => {
   };
 
   const uploadImageToServer = async () => {
-    for (const file of selectedFileList) {
+    setLoader(true)
+    await selectedFileList.forEach(async(file) =>{
       const fileName = Date.now() + ".jpeg";
       const storageRef = ref(storage, "car-marketPlace/" + fileName);
       const metaData = { contentType: "image/jpeg" };
 
-      try {
-        await uploadBytes(storageRef, file, metaData);
-        console.log("File uploaded");
 
-        const downloadUrl = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, file, metaData);
+        console.log("uploaded file");
+    }).then(resp =>{
+      getDownloadURL(storageRef).then(async(downloadUrl) =>{
         console.log(downloadUrl);
-
         await db.insert(CarImages).values({
-          imageUrl: downloadUrl,
-          carListingId: triggerUploadImages,
-        });
-      } catch (err) {
-        console.error("Upload error:", err);
-      }
-    }
-  };
+          imageUrl:downloadUrl,
+          carListingId:triggerUploadImages
+        })
+        
+      })
+    })
+    
+    setLoader(false);
+    
+  }
+
+}
+        
+
+       
+    
+  
 
   return (
     <div>

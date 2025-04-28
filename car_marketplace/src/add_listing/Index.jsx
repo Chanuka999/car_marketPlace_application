@@ -19,8 +19,10 @@ import { CarListing } from "../../configs/schema";
 const AddListing = () => {
   const [formData, setFormData] = useState({});
   const [featureData, setFeatureData] = useState({});
+  const [triggerUploadImages, setTriggerUploadImages] = useState();
   const [carListingId, setCarListingId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const { loader, setLoader } = useState(false);
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
@@ -37,7 +39,9 @@ const AddListing = () => {
   };
 
   const onSubmit = async (e) => {
+    setLoader(true);
     e.preventDefault();
+    console.log(formData);
 
     try {
       const result = await db
@@ -48,7 +52,10 @@ const AddListing = () => {
         })
         .returning({ id: CarListing.id });
 
-      if (result?.length > 0) {
+      if (result) {
+        console.log("data saved");
+        setTriggerUploadImages(result[0]?.id);
+        setLoader(false);
         setCarListingId(result[0].id);
         setSuccessMsg("Car listing submitted successfully!");
       }
@@ -121,10 +128,13 @@ const AddListing = () => {
 
           <Separator className="my-6" />
 
-          <UploadImage triggerUploadImages={carListingId} />
+          <UploadImage
+            triggerUploadImages={triggerUploadImages}
+            setLoader={(v) => setLoader(v)}
+          />
 
           <div className="mt-10 flex justify-end">
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={loader} onClick={(e) =>onSubmit(e)} {! loader?"onSubmit":submit}>Submit</Button>
           </div>
         </form>
       </div>
