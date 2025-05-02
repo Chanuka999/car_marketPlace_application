@@ -19,14 +19,15 @@ import { CarListing } from "../../configs/schema";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import moment from "moment";
+import moments from "moment";
 
 const AddListing = () => {
   const [formData, setFormData] = useState({});
   const [featureData, setFeatureData] = useState({});
   const [triggerUploadImages, setTriggerUploadImages] = useState(null);
+  const [carListingId, setCarListingId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const { user } = useUser();
 
@@ -40,21 +41,15 @@ const AddListing = () => {
   const handleFeatureChange = (name, value) => {
     setFeatureData((prev) => ({
       ...prev,
-      [name]: !!value,
+      [name]: value ? true : false,
     }));
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
     setLoader(true);
-
-    if (!user) {
-      toast.error("User not authenticated");
-      setLoader(false);
-      return;
-    }
-
-    toast("Please wait...");
+    e.preventDefault();
+    console.log(formData);
+    toast("please wait...");
 
     try {
       const result = await db
@@ -63,22 +58,17 @@ const AddListing = () => {
           ...formData,
           features: featureData,
           createdBy: user?.primaryEmailAddress?.emailAddress,
-          postedOn: moment().format("DD/MM/YYYY"),
+          postedOn: moments().format("DD/MM/YYYY"),
         })
         .returning({ id: CarListing.id });
 
-      if (result && result[0]?.id) {
-        console.log("Data saved:", result);
+      if (result) {
+        console.log("Data saved");
         setTriggerUploadImages(result[0].id);
-        setSuccessMsg("Listing created successfully! Uploading images...");
-      } else {
-        toast.error("Failed to create listing");
+        setLoader(false);
       }
     } catch (e) {
-      console.error("Error saving listing:", e);
-      toast.error("Error saving listing");
-    } finally {
-      setLoader(false);
+      console.error("Error", e);
     }
   };
 
@@ -150,18 +140,16 @@ const AddListing = () => {
             triggerUploadImages={triggerUploadImages}
             setLoader={(v) => {
               setLoader(v);
-              if (!v) {
-                navigate("/profile");
-              }
+              navigate("/profile");
             }}
           />
 
           <div className="mt-10 flex justify-end">
             <Button type="submit" disabled={loader}>
               {loader ? (
-                <BiLoaderAlt className="animate-spin text-lg" />
+                "Submitting..."
               ) : (
-                "Submit"
+                <BiLoaderAlt className="animate-spin text-lg" />
               )}
             </Button>
           </div>
