@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Header from "@/components/Header";
 import carDetails from "./../components/Shared/carDetails.json";
 import features from "./../components/Shared/features.json";
+import { BiLoaderAlt } from "react-icons/bi";
 
 import InputFeild from "./Components/InputFeild";
 import DropDownFeild from "./Components/DropDownFeild";
@@ -15,14 +16,19 @@ import { Separator } from "@radix-ui/react-select";
 
 import { db } from "../../configs/Index.js";
 import { CarListing } from "../../configs/schema";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import moment from "moment";
 
 const AddListing = () => {
   const [formData, setFormData] = useState({});
   const [featureData, setFeatureData] = useState({});
-  const [triggerUploadImages, setTriggerUploadImages] = useState();
-  const [carListingId, setCarListingId] = useState(null);
+  const [triggerUploadImages, setTriggerUploadImages] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
-  const { loader, setLoader } = useState(false);
+  const [loader, setLoader] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useUser();
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
@@ -34,14 +40,21 @@ const AddListing = () => {
   const handleFeatureChange = (name, value) => {
     setFeatureData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: !!value,
     }));
   };
 
   const onSubmit = async (e) => {
-    setLoader(true);
     e.preventDefault();
-    console.log(formData);
+    setLoader(true);
+
+    if (!user) {
+      toast.error("User not authenticated");
+      setLoader(false);
+      return;
+    }
+
+    toast("Please wait...");
 
     try {
       const result = await db
@@ -49,18 +62,23 @@ const AddListing = () => {
         .values({
           ...formData,
           features: featureData,
+          createdBy: user?.primaryEmailAddress?.emailAddress,
+          postedOn: moment().format("DD/MM/YYYY"),
         })
         .returning({ id: CarListing.id });
 
-      if (result) {
-        console.log("data saved");
-        setTriggerUploadImages(result[0]?.id);
-        setLoader(false);
-        setCarListingId(result[0].id);
-        setSuccessMsg("Car listing submitted successfully!");
+      if (result && result[0]?.id) {
+        console.log("Data saved:", result);
+        setTriggerUploadImages(result[0].id);
+        setSuccessMsg("Listing created successfully! Uploading images...");
+      } else {
+        toast.error("Failed to create listing");
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (e) {
+      console.error("Error saving listing:", e);
+      toast.error("Error saving listing");
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -130,11 +148,22 @@ const AddListing = () => {
 
           <UploadImage
             triggerUploadImages={triggerUploadImages}
-            setLoader={(v) => setLoader(v)}
+            setLoader={(v) => {
+              setLoader(v);
+              if (!v) {
+                navigate("/profile");
+              }
+            }}
           />
 
           <div className="mt-10 flex justify-end">
-            <Button type="submit" disabled={loader} onClick={(e) =>onSubmit(e)} {! loader?"onSubmit":submit}>Submit</Button>
+            <Button type="submit" disabled={loader}>
+              {loader ? (
+                <BiLoaderAlt className="animate-spin text-lg" />
+              ) : (
+                "Submit"
+              )}
+            </Button>
           </div>
         </form>
       </div>
