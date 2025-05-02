@@ -6,21 +6,19 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { CarImages } from "./../../../configs/schema";
 import { db } from "./../../../configs/Index";
 
-const UploadImage = ({ triggerUploadImages,setLoader }) => {
+const UploadImage = ({ triggerUploadImages, setLoader }) => {
   const [selectedFileList, setSelectedFileList] = useState([]);
 
   useEffect(() => {
-    if (triggerUploadImages) {
+    if (triggerUploadImages && selectedFileList.length > 0) {
       uploadImageToServer();
     }
   }, [triggerUploadImages]);
 
   const onFileSelected = (event) => {
     const files = event.target.files;
-    for (let i = 0; i < files?.length; i++) {
-      const file = files[i];
-      setSelectedFileList((prev) => [...prev, file]);
-    }
+    const fileArray = Array.from(files);
+    setSelectedFileList((prev) => [...prev, ...fileArray]);
   };
 
   const onImageRemove = (image) => {
@@ -29,40 +27,38 @@ const UploadImage = ({ triggerUploadImages,setLoader }) => {
   };
 
   const uploadImageToServer = async () => {
-    setLoader(true)
-    await selectedFileList.forEach(async(file) =>{
-      const fileName = Date.now() + ".jpeg";
-      const storageRef = ref(storage, "car-marketPlace/" + fileName);
-      const metaData = { contentType: "image/jpeg" };
+    setLoader(true);
 
+    try {
+      for (const file of selectedFileList) {
+        const extension = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}.${extension}`;
+        const storageRef = ref(storage, `car-marketPlace/${fileName}`);
+        const metaData = { contentType: file.type };
 
-      await uploadBytes(storageRef, file, metaData);
-        console.log("uploaded file");
-    }).then(resp =>{
-      getDownloadURL(storageRef).then(async(downloadUrl) =>{
-        console.log(downloadUrl);
+        await uploadBytes(storageRef, file, metaData);
+        console.log("Uploaded file:", fileName);
+
+        const downloadUrl = await getDownloadURL(storageRef);
+        console.log("Download URL:", downloadUrl);
+
         await db.insert(CarImages).values({
-          imageUrl:downloadUrl,
-          carListingId:triggerUploadImages
-        })
-        
-      })
-    })
-    
-    setLoader(false);
-    
-  }
-
-}
-        
-
-       
-    
-  
+          imageUrl: downloadUrl,
+          carListingId: triggerUploadImages,
+        });
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+    } finally {
+      setLoader(false);
+    }
+  };
 
   return (
     <div>
-      <h2 className="font-medium text-xl my-3">Upload car Images</h2>
+      <h2 className="font-medium text-xl my-3">Upload Car Images</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
         {selectedFileList.map((image, index) => (
           <div key={index} className="relative">
