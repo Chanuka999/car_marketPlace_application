@@ -25,9 +25,8 @@ const AddListing = () => {
   const [formData, setFormData] = useState({});
   const [featureData, setFeatureData] = useState({});
   const [triggerUploadImages, setTriggerUploadImages] = useState(null);
-  const [carListingId, setCarListingId] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
   const { user } = useUser();
 
@@ -46,10 +45,9 @@ const AddListing = () => {
   };
 
   const onSubmit = async (e) => {
-    setLoader(true);
     e.preventDefault();
-    console.log(formData);
-    toast("please wait...");
+    setLoader(true);
+    toast("Please wait...");
 
     try {
       const result = await db
@@ -62,13 +60,15 @@ const AddListing = () => {
         })
         .returning({ id: CarListing.id });
 
-      if (result) {
+      if (result && result[0]?.id) {
         console.log("Data saved");
         setTriggerUploadImages(result[0].id);
-        setLoader(false);
       }
     } catch (e) {
       console.error("Error", e);
+      toast.error("Something went wrong!");
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -147,9 +147,9 @@ const AddListing = () => {
           <div className="mt-10 flex justify-end">
             <Button type="submit" disabled={loader}>
               {loader ? (
-                "Submitting..."
-              ) : (
                 <BiLoaderAlt className="animate-spin text-lg" />
+              ) : (
+                "Submit"
               )}
             </Button>
           </div>
