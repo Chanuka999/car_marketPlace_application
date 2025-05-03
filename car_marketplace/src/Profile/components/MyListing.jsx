@@ -5,6 +5,7 @@ import { CarImages, CarListing } from "./../../../configs/schema";
 import { desc, eq } from "drizzle-orm";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import Service from "@/components/Shared/Service";
 
 const MyListing = () => {
   const { user } = useUser();
@@ -20,7 +21,8 @@ const MyListing = () => {
       .where(eq(CarListing.createdBy, user?.primaryEmailAddress?.emailAddress))
       .orderBy(desc(CarListing.id));
 
-    console.log(result);
+    const resp = Service.FormatResult(result);
+    console.log(resp);
   };
   return (
     <div className="mt-6">
