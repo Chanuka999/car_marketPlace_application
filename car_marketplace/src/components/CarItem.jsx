@@ -13,33 +13,35 @@ const CarItem = ({ car }) => {
       </h2>
       <img
         src={car?.image}
+        width={"100%"}
+        height={250}
         className="rounded-t-lg w-full h-48 object-cover sm:h-64"
         alt={car?.name}
       />
       <div className="p-3 sm:p-4">
         <h2 className="font-semibold text-black text-base sm:text-sm mb-2">
-          {car?.name}
+          {car?.listingTitle}
         </h2>
         <Separator />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 text-xs sm:text-sm">
           <div className="flex flex-col items-center sm:items-center">
             <BsFillFuelPumpDieselFill className="text-lg mb-1" />
-            <h2 className="text-center">{car.miles} Miles</h2>
+            <h2 className="text-center">{car?.mileage} Miles</h2>
           </div>
           <div className="flex flex-col items-center sm:items-center">
             <MdSpeed className="text-lg mb-1" />
-            <h2 className="text-center">{car.fuelType}</h2>
+            <h2 className="text-center">{car?.fuelType}</h2>
           </div>
           <div className="flex flex-col items-center sm:items-center">
             <GiGearStickPattern className="text-lg mb-1" />
-            <h2 className="text-center">{car.gearType}</h2>
+            <h2 className="text-center">{car?.transmission}</h2>
           </div>
         </div>
 
         <Separator className="my-3" />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <h2 className="font-bold text-lg sm:text-xl">${car.price}</h2>
+          <h2 className="font-bold text-lg sm:text-xl">${car?.sellingPrice}</h2>
           <h2 className="text-primary text-xs sm:text-sm flex gap-1 items-center">
             view details
             <MdOpenInNew />

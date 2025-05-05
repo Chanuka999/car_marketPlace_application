@@ -1,30 +1,25 @@
 import { CarImages } from "./../../../configs/schema";
 
 const FormatResult = (resp) => {
-  let result = [];
-  let finalResult = [];
+  const resultMap = new Map();
 
   resp.forEach((item) => {
-    const listingId = item.carLisiting?.id;
-    if (!result[listingId]) {
-      result[listingId] = {
-        car: item.carLisiting,
+    const listingId = item.carListing?.id; // Corrected typo: carLisiting -> carListing
+    if (!listingId) return; // Skip if listingId is undefined
+
+    if (!resultMap.has(listingId)) {
+      resultMap.set(listingId, {
+        car: item.carListing,
         images: [],
-      };
+      });
     }
 
     if (item.CarImages) {
-      result[listingId].images.push(item.CarImages);
+      resultMap.get(listingId).images.push(item.CarImages);
     }
   });
 
-  result.forEach((item) => {
-    finalResult.push({
-      ...item.car,
-      images: item.images,
-    });
-  });
-
+  const finalResult = Array.from(resultMap.values()); // Convert Map to Array
   return finalResult;
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import carDetails from "./../components/Shared/carDetails.json";
 import features from "./../components/Shared/features.json";
@@ -17,18 +17,35 @@ import { Separator } from "@radix-ui/react-select";
 import { db } from "../../configs/Index.js";
 import { CarListing } from "../../configs/schema";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import moments from "moment";
+import Service from "@/components/Shared/Service";
 
 const AddListing = () => {
   const [formData, setFormData] = useState({});
   const [featureData, setFeatureData] = useState({});
   const [triggerUploadImages, setTriggerUploadImages] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+  const [searchParams] = useSearchParams();
   const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
   const { user } = useUser();
+
+  const mode = searchParams.get("made");
+  const recordId = searchParams.get("id");
+
+  useEffect(() => {
+    if (mode == "edit") {
+    }
+  }, []);
+
+  const GetListingDetails = async () => {
+    const reault = await db.select().from(CarListing);
+    innerJoin(CarListing.id, recordId);
+
+    const resp = Service.FormResultreading;
+  };
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({
